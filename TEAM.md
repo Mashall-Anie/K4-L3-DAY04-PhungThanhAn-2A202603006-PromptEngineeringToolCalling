@@ -7,7 +7,7 @@
 - Tên nhóm: PhungThanhAn-2A202603006
 - Người đại diện / MSSV: Phùng Thành An / 2A202603006
 - Tên repo: `K4-L3-DAY04-PhungThanhAn-2A202603006-PromptEngineeringToolCalling`
-- URL repo, nhánh nộp, commit chốt: https://github.com/Mashall-Anie/K4-L3-DAY04-PhungThanhAn-2A202603006-PromptEngineeringToolCalling, nhánh `main`, commit chốt: 218d755f39d8e122def8b53272f87875425cca18
+- URL repo, nhánh nộp, commit chốt: https://github.com/Mashall-Anie/K4-L3-DAY04-PhungThanhAn-2A202603006-PromptEngineeringToolCalling, nhánh `main`, commit chốt: 8132babff055819efa6bcd2e1e2f936f0a725ab7
 - Deadline áp dụng và link thông báo đổi hạn nếu có: 12h00 - 16/09/2026
 
 ## Thành viên
