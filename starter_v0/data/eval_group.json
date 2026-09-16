@@ -1,7 +1,314 @@
 {
   "dataset_id": "day04_v3_helpdesk_group",
   "dataset_role": "group",
-  "description": "Template intentionally left empty. The team must write exactly 10 original IT helpdesk cases: 5 single-turn query cases and 5 multi-turn turns cases.",
-  "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
-  "cases": []
+  "description": "Team-authored extension cases for the IT Helpdesk Agent: 5 single-turn + 5 multi-turn, exercising tools/params not covered by the fixed base 30.",
+  "allowed_failure_types": [
+    "wrong_tool",
+    "wrong_arg_value",
+    "wrong_boundary",
+    "unnecessary_tool",
+    "out_of_scope",
+    "missing_info"
+  ],
+  "cases": [
+    {
+      "id": "G01_printing_status",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "route_printing_service",
+        "difficulty": "easy",
+        "what_it_tests": "Dịch vụ printing (chưa test ở bộ base) phải đi vào check_service_status với đúng environment."
+      },
+      "input": "Dịch vụ in ấn (printing) trên production có đang hoạt động không?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "check_service_status",
+            "args": {
+              "service": "printing",
+              "environment": "production"
+            }
+          }
+        ]
+      },
+      "failure_type": "wrong_tool"
+    },
+    {
+      "id": "G02_policy_lookup",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "route_policy",
+        "difficulty": "medium",
+        "what_it_tests": "Câu hỏi về chính sách nội bộ phải dùng tool policy với đúng policy_area, không dùng search_kb."
+      },
+      "input": "Tìm chính sách về kiểm soát truy cập (access control) cho nhân viên mới vào công ty.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "policy",
+            "args": {
+              "policy_area": "access_control"
+            }
+          }
+        ]
+      },
+      "failure_type": "wrong_tool"
+    },
+    {
+      "id": "G03_device_software_check",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "device_check_arg_software",
+        "difficulty": "medium",
+        "what_it_tests": "Trích đúng asset_id và check=software (chưa test riêng ở bộ base)."
+      },
+      "input": "Kiểm tra riêng phần mềm cài trên máy DT-050.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "inspect_device",
+            "args": {
+              "asset_id": "DT-050",
+              "check": "software"
+            }
+          }
+        ]
+      },
+      "failure_type": "wrong_arg_value"
+    },
+    {
+      "id": "G04_meeting_room_kb",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "route_howto_meeting_room",
+        "difficulty": "medium",
+        "what_it_tests": "search_kb với category meeting_room (chưa test ở bộ base)."
+      },
+      "input": "Tìm hướng dẫn khắc phục lỗi hệ thống đặt phòng họp.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "search_kb",
+            "args": {
+              "category": "meeting_room"
+            }
+          }
+        ]
+      },
+      "failure_type": "wrong_tool"
+    },
+    {
+      "id": "G05_ticket_sso_confirm_boundary",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "confirm_write_sso",
+        "difficulty": "medium",
+        "what_it_tests": "Write action (create_ticket) cho service SSO vẫn phải dừng ở clarify(yes_no) trước, không tự tạo."
+      },
+      "input": "Tạo ticket mức critical báo SSO bị lỗi đăng nhập cho toàn công ty.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "yes_no"
+            }
+          }
+        ]
+      },
+      "failure_type": "wrong_boundary"
+    },
+    {
+      "id": "G06_multiturn_carry_environment_sso",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_environment_correction",
+        "difficulty": "hard",
+        "what_it_tests": "User sửa environment ở lượt sau; giá trị mới phải thắng giá trị ngầm định ban đầu."
+      },
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "check_service_status",
+            "args": {
+              "service": "sso",
+              "environment": "staging"
+            }
+          }
+        ]
+      },
+      "failure_type": "wrong_arg_value",
+      "turns": [
+        {
+          "role": "user",
+          "content": "SSO có vấn đề gì không?"
+        },
+        {
+          "role": "user",
+          "content": "À ý mình là môi trường staging, không phải production."
+        }
+      ]
+    },
+    {
+      "id": "G07_multiturn_policy_narrow",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_narrow_scope",
+        "difficulty": "medium",
+        "what_it_tests": "Lượt sau thu hẹp phạm vi câu hỏi chính sách; phải dùng đúng policy_area mới, không phải 'all'."
+      },
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "policy",
+            "args": {
+              "policy_area": "external_tools"
+            }
+          }
+        ]
+      },
+      "failure_type": "wrong_arg_value",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tra chính sách bảo mật dữ liệu công ty."
+        },
+        {
+          "role": "user",
+          "content": "Chỉ cần phần liên quan đến việc dùng công cụ bên ngoài (external tools) thôi."
+        }
+      ]
+    },
+    {
+      "id": "G08_multiturn_correct_asset_printer",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_correction_device",
+        "difficulty": "hard",
+        "what_it_tests": "Sửa asset_id ở lượt sau (thiết bị máy in); giá trị đúng phải thắng giá trị sai ban đầu."
+      },
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "inspect_device",
+            "args": {
+              "asset_id": "PR-410",
+              "check": "all"
+            }
+          }
+        ]
+      },
+      "failure_type": "wrong_arg_value",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Kiểm tra máy in PR-404 giúp mình."
+        },
+        {
+          "role": "user",
+          "content": "À nhầm, mã đúng là PR-410."
+        }
+      ]
+    },
+    {
+      "id": "G09_multiturn_cancel_then_new_intent",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_cancel_switch",
+        "difficulty": "hard",
+        "what_it_tests": "User hủy yêu cầu tạo ticket rồi đổi sang một yêu cầu đọc-dữ-liệu khác; không được tạo ticket, phải phục vụ intent mới nhất."
+      },
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "check_service_status",
+            "args": {
+              "service": "wifi",
+              "environment": "production"
+            }
+          }
+        ]
+      },
+      "failure_type": "wrong_tool",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tạo ticket lỗi wifi cho DT-087 mức low."
+        },
+        {
+          "role": "user",
+          "content": "Thôi khoan đã, đừng tạo gì cả."
+        },
+        {
+          "role": "user",
+          "content": "Kiểm tra trạng thái wifi production trước đã."
+        }
+      ]
+    },
+    {
+      "id": "G10_multiturn_proactive_confirmation",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_explicit_confirm_upfront",
+        "difficulty": "hard",
+        "what_it_tests": "User chủ động xác nhận yes/no ngay trong câu, không đợi agent hỏi lại; agent vẫn phải nhận diện đây là xác nhận hợp lệ trên đúng payload cuối cùng và gọi create_ticket với confirmed=true."
+      },
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "create_ticket",
+            "args": {
+              "priority": "high",
+              "confirmed": true
+            }
+          }
+        ]
+      },
+      "failure_type": "wrong_boundary",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tạo ticket tài khoản bị khóa cho EMP-1010 mức medium."
+        },
+        {
+          "role": "user",
+          "content": "Đổi mức ưu tiên thành high."
+        },
+        {
+          "role": "user",
+          "content": "OK mình xác nhận tạo luôn, không cần hỏi lại nữa."
+        }
+      ]
+    }
+  ]
 }

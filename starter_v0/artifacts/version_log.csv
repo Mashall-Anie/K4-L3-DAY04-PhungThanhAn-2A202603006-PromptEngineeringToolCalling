@@ -1,1 +1,4 @@
-version,author,changed_artifact,artifact_version,prompt_hash,tools_hash,reason,hypothesis,metric_name,metric_before,metric_after,run_file
+version,change,hypothesis,run_path,case_accuracy_before,case_accuracy_after
+v1,"Added 'Parameter extraction' section...",...,"runs/v1_...json",0.7,0.7333
+v2,"Added 'Write action confirmation' section...",...,"runs/v2_...json",0.7333,0.7667
+v3,"Added 'Tool invocation format' section (always use real function-calling, never print tool call as text); extended 'Field mapping examples' (map environment/category/check from stated context instead of defaulting to all); added 'Tool call boundary' section (no speculative inspect_device after lookup_user, never treat employee_id as asset_id)","Agent still (1) sometimes prints tool calls as text instead of real function calls, (2) defaults environment/category/check to broad values when context names them explicitly, and (3) speculatively inspects a device using an employee_id as asset_id after lookup_user","runs/v3_B_base_openrouter_20260915T205504173722.json",0.7667,1.0
