@@ -1,9 +1,9 @@
 # Day 04 Lab v3 Report — Trợ lý AI của nhóm
 
 - Lĩnh vực tự chọn:: IT Helpdesk
-- Nhiệm vụ và luồng cơ bản đã chốt trước v0:
-- Đường dẫn bộ 30 câu cơ bản và 12 câu an toàn; commit chốt bộ trước v0:
-- Chức năng mở rộng ngoài luồng cơ bản (nếu có; tối đa 10 trong tổng 100 điểm):
+- Nhiệm vụ và luồng cơ bản đã chốt trước v0: 7 tool core, hỏi lại khi thiếu asset/employee ID, xác nhận trước khi ghi ticket
+- Đường dẫn bộ 30 câu cơ bản và 12 câu an toàn; commit chốt bộ trước v0: starter_v0/data/eval_base.json, starter_v0/data/eval_adversarial.json
+- Chức năng mở rộng ngoài luồng cơ bản (nếu có; tối đa 10 trong tổng 100 điểm): 
 
 ## Team
 
@@ -18,7 +18,7 @@
 
 > Agent là trợ lý IT service desk nội bộ cho công ty giả lập Northstar Labs. Agent hỗ trợ tra cứu trạng thái dịch vụ (VPN/email theo môi trường production/staging), chẩn đoán thiết bị theo asset ID, tra cứu nhân viên, tìm bài hướng dẫn trong knowledge base, định dạng báo cáo sự cố, và tạo ticket hỗ trợ sau khi xác nhận. Agent luôn hỏi lại khi thiếu asset ID/employee ID hoặc khi environment không rõ ràng, và không bao giờ tạo ticket mà chưa có xác nhận yes/no rõ ràng trên đúng nội dung mới nhất.
 
-**Link dùng thử:**
+**Link dùng thử:** Không deploy, chạy local qua python chat.py --provider openrouter --version v3
 
 > URL:
 
@@ -60,9 +60,9 @@ total_cases`, và tool result error đã được review thủ công.
 | Version | Prompt/tool change | Hypothesis | Metric | Before | After | Run file |
 |---|---|---|---|---:|---:|---|
 | v0 | baseline (chưa sửa) | — | case_accuracy | — | 0.70 | runs/v0_B_base_openrouter_20260915T200018505734.json |
-| v1 | Thêm section "Parameter extraction": bắt buộc trích xuất mọi tham số user đã nêu (service, environment, asset_id, check, category, employee_id); không mặc định rộng (check="all"/category="all"); carry-forward qua nhiều lượt | Agent mặc định giá trị rộng hoặc bỏ tham số vì prompt chưa bắt buộc trích xuất/giữ lại | case_accuracy | 0.70* | 0.7333 | runs/v1_...json |
-| v2 | Thêm section "Write action confirmation": create_ticket bắt buộc có xác nhận yes/no trên đúng payload hiện tại; đổi payload làm mất hiệu lực xác nhận cũ | Agent tạo ticket mà không xác nhận thật, hoặc coi xác nhận cũ vẫn còn hiệu lực sau khi payload đổi | case_accuracy | 0.7333 | 0.7667 | runs/v2_...json |
-| v3 | Thêm "Tool invocation format" (luôn gọi tool thật qua function-calling, không in tool call dạng text); mở rộng "Field mapping examples" (map environment/category/check từ ngữ cảnh câu hỏi thay vì mặc định "all"); thêm "Tool call boundary" (không tự gọi inspect_device sau lookup_user nếu không có asset_id thật, không dùng employee_id làm asset_id) | Agent vẫn đôi khi in tool call dạng text thay vì gọi hàm thật,mặc định environment/category/check về giá trị rộng dù ngữ cảnh đã nêu rõ, suy đoán asset_id từ employee_id sau lookup_user | case_accuracy | 0.7667 | 1.0 | runs/v3_B_base....json |
+| v1 | Thêm section "Parameter extraction": bắt buộc trích xuất mọi tham số user đã nêu (service, environment, asset_id, check, category, employee_id); không mặc định rộng (check="all"/category="all"); carry-forward qua nhiều lượt | Agent mặc định giá trị rộng hoặc bỏ tham số vì prompt chưa bắt buộc trích xuất/giữ lại | case_accuracy | 0.70* | 0.7333 | runs/v1_B_base_openrouter_20260915T200530731438.json |
+| v2 | Thêm section "Write action confirmation": create_ticket bắt buộc có xác nhận yes/no trên đúng payload hiện tại; đổi payload làm mất hiệu lực xác nhận cũ | Agent tạo ticket mà không xác nhận thật, hoặc coi xác nhận cũ vẫn còn hiệu lực sau khi payload đổi | case_accuracy | 0.7333 | 0.7667 | runs/v2_B_base_openrouter_20260915T200859061106.json |
+| v3 | Thêm "Tool invocation format" (luôn gọi tool thật qua function-calling, không in tool call dạng text); mở rộng "Field mapping examples" (map environment/category/check từ ngữ cảnh câu hỏi thay vì mặc định "all"); thêm "Tool call boundary" (không tự gọi inspect_device sau lookup_user nếu không có asset_id thật, không dùng employee_id làm asset_id) | Agent vẫn đôi khi in tool call dạng text thay vì gọi hàm thật,mặc định environment/category/check về giá trị rộng dù ngữ cảnh đã nêu rõ, suy đoán asset_id từ employee_id sau lookup_user | case_accuracy | 0.7667 | 1.0 | v3_B_base_openrouter_20260915T205504173722.json |
 
 ## B2. Failure analysis
 
@@ -126,9 +126,9 @@ nhóm tự xây.
 
 | Category | Evidence file | What worked | Risk / guardrail |
 |---|---|---|---|
-| Optional built-in |  |  |  |
-| External search + privacy boundary |  |  |  |
-| Bonus: tool mới do nhóm tự xây |  |  |  |
+| Optional built-in |  | Không sử dụng |  |
+| External search + privacy boundary |  | Không sử dụng |  |
+| Bonus: tool mới do nhóm tự xây |  | Không có |  |
 
 ## B6. Safety review
 
@@ -154,28 +154,28 @@ commit evidence của bất kỳ thành viên nào còn thiếu.
 
 Hoàn thành mục nhận xét chung trong [TEAM.md](../../TEAM.md). Dẫn tới các run, file và commit trong phần B để chứng minh kết quả. Ghi dưới đây đường dẫn tới mục đã hoàn thành:
 
-> Link: 
+> Link: https://github.com/Mashall-Anie/K4-L3-DAY04-PhungThanhAn-2A202603006-PromptEngineeringToolCalling/blob/main/TEAM.md#nhận-xét-chung
 
 ## C2. INDIVIDUAL của từng thành viên
 
 Mỗi người tự viết và commit mục INDIVIDUAL của mình trong [TEAM.md](../../TEAM.md), nêu phần việc, bằng chứng kỹ thuật và điều đã học. Không yêu cầu chép lại cùng nội dung ở đây. Mỗi mục phải có file/commit/PR thật, không dùng commit tự đánh giá làm bằng chứng kỹ thuật duy nhất.
 
-> Link các mục INDIVIDUAL: 
+> Link các mục INDIVIDUAL: - Phùng Thành An: https://github.com/Mashall-Anie/K4-L3-DAY04-PhungThanhAn-2A202603006-PromptEngineeringToolCalling/blob/main/TEAM.md#individual
 
 ## C3. Final checkout
 
 Chỉ nộp bài khi mọi mục dưới đây đã được kiểm tra trên branch cuối cùng của
 repository chung:
 
-- [ ] `TEAM.md` có đủ họ tên, MSSV, GitHub username và vai trò.
-- [ ] Mỗi thành viên có ít nhất một commit trong lịch sử branch nộp bài.
-- [ ] Phần nhận xét chung trong TEAM.md đã hoàn thành và có evidence.
-- [ ] Mỗi thành viên đã tự viết và commit mục INDIVIDUAL trong TEAM.md.
-- [ ] `system_prompt.md`, `tools.yaml`, version log, runs, eval, transcript, UI
+- [x] `TEAM.md` có đủ họ tên, MSSV, GitHub username và vai trò.
+- [x] Mỗi thành viên có ít nhất một commit trong lịch sử branch nộp bài.
+- [x] Phần nhận xét chung trong TEAM.md đã hoàn thành và có evidence.
+- [x] Mỗi thành viên đã tự viết và commit mục INDIVIDUAL trong TEAM.md.
+- [x] `system_prompt.md`, `tools.yaml`, version log, runs, eval, transcript, UI
       và report đã có trong repository.
-- [ ] Không có `.env`, API key, token, dữ liệu thật, cache hoặc generated ticket.
-- [ ] Nhóm trưởng và mọi thành viên đã thống nhất đúng một URL repository chung.
-- [ ] Nhóm trưởng và mọi thành viên sẽ nộp cùng URL đó trên VLearn.
+- [x] Không có `.env`, API key, token, dữ liệu thật, cache hoặc generated ticket.
+- [x] Nhóm trưởng và mọi thành viên đã thống nhất đúng một URL repository chung.
+- [x] Nhóm trưởng và mọi thành viên sẽ nộp cùng URL đó trên VLearn.
 
 **URL repository chung dùng để nộp:**
 
